@@ -15,6 +15,7 @@
  */
 package org.opendataloader.pdf.markdown;
 
+import org.opendataloader.pdf.utils.BulletedParagraphUtils;
 import org.opendataloader.pdf.api.Config;
 import org.opendataloader.pdf.containers.StaticLayoutContainers;
 import org.opendataloader.pdf.entities.SemanticFormula;
@@ -441,20 +442,21 @@ public class MarkdownGenerator implements Closeable {
     }
 
     /**
-     * Whether the leading {@code labelLength} characters of an unordered list item are a bullet
+     * Whether the leading {@code labelLength} characters of an unordered list item are a label
      * glyph that may be dropped from the Markdown output.
      *
      * <p>Unordered intervals assembled from plain text nodes (e.g. items coming from a hybrid
      * backend, which already separated the marker from the text) carry a label length of 1 for
      * every item because the label detection treats the first character as the label. Cutting
      * unconditionally then removes the first real character of the item ("단감시즌" → "감시즌",
-     * "2022년" → "022년"). Only strip when the text really starts with a non-alphanumeric glyph.
+     * "2022년" → "022년", "(note)" → "note)"). Only strip when the text starts with one of the
+     * glyphs the label detection itself accepts as a bullet.
      */
     static boolean startsWithLabelGlyph(String itemText, int labelLength) {
-        if (itemText == null || labelLength <= 0 || labelLength > itemText.length()) {
+        if (itemText == null || itemText.isEmpty() || labelLength <= 0 || labelLength > itemText.length()) {
             return false;
         }
-        return !Character.isLetterOrDigit(itemText.codePointAt(0));
+        return BulletedParagraphUtils.isPossibleLabelGlyph(itemText.codePointAt(0));
     }
 
     protected String getCorrectMarkdownString(String value) {
