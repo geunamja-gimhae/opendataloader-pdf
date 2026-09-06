@@ -241,4 +241,29 @@ public class MarkdownGeneratorTest {
         MarkdownGenerator generator = newGeneratorForEscaping();
         assertEquals("&amp;amp;", generator.getCorrectMarkdownString("&amp;"));
     }
+
+    @Test
+    void testStartsWithLabelGlyph_bulletGlyphsAreStripped() {
+        assertTrue(MarkdownGenerator.startsWithLabelGlyph("• item", 1));
+        assertTrue(MarkdownGenerator.startsWithLabelGlyph("- item", 1));
+        assertTrue(MarkdownGenerator.startsWithLabelGlyph("◦ 진영농협", 1));
+        assertTrue(MarkdownGenerator.startsWithLabelGlyph("□ 화훼 생산 현황", 1));
+    }
+
+    @Test
+    void testStartsWithLabelGlyph_textWithoutBulletKeepsFirstCharacter() {
+        // Items assembled from plain text nodes carry labelLength == 1 although nothing was a label:
+        // the first real character (Hangul, Latin or a digit) must survive.
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph("단감시즌 외 선별작업이 없어", 1));
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph("2022년 파프리카 글로벌GAP 인증", 1));
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph("Turn the focusing knob", 1));
+    }
+
+    @Test
+    void testStartsWithLabelGlyph_invalidLengths() {
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph("• item", 0));
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph("•", 2));
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph("", 1));
+        assertFalse(MarkdownGenerator.startsWithLabelGlyph(null, 1));
+    }
 }
