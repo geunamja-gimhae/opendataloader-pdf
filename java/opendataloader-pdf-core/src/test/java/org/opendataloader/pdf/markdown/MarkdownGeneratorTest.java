@@ -307,6 +307,7 @@ public class MarkdownGeneratorTest {
         assertTrue(markdown.contains("- first item"), markdown);
         assertTrue(markdown.contains("- 진영농협"), markdown);
         assertTrue(markdown.contains("- dashed item"), markdown);
+        assertFalse(markdown.contains("- - dashed item"), markdown);
         assertFalse(markdown.contains("• "), markdown);
         assertFalse(markdown.contains("◦ "), markdown);
     }
